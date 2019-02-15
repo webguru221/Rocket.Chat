@@ -12,6 +12,8 @@ import { modal } from './modal';
 import { messageBox } from './messageBox';
 import { MessageAction } from './MessageAction';
 import { RoomManager } from './RoomManager';
+import { emoji } from 'meteor/rocketchat:emoji';
+import Chart from 'chart.js/src/chart.js';
 
 export const popover = {
 	renderedPopover: null,
@@ -37,18 +39,59 @@ export const popover = {
 	},
 };
 
+const getEmojiByName = (name) => {
+	const image = emoji.packages['emojione'].render(`:${name}:`);
+	html = `<span class="emoji-${name}" data-emoji="${name}" title="${name}">${image}</span>`;
+
+	return html;
+}
+
 Template.popover.helpers({
 	hasAction() {
 		return !!this.action;
 	},
+	getEmoji(name) {
+		return getEmojiByName(name);
+	}
 });
 
-Template.popover.onRendered(function() {
+Template.popover.onRendered(function () {
 	if (this.data.onRendered) {
 		this.data.onRendered();
 	}
 
-	$('.rc-popover').click(function(e) {
+	if(this.data && this.data.columns[0]) {
+		const group = this.data.columns[0].groups.find(group => group.chart != undefined);
+		if(group && group.chart != undefined) {
+			const ctx = document.getElementById("emojiChart");
+
+			if (ctx) {
+				const barChartData = {
+					labels: group.labels,
+					datasets: [{
+						label: 'Emoji stats',
+						data: group.chart
+					}]
+		
+				};
+				let myBarChart = new Chart(ctx, {
+					type: 'bar',
+					data: barChartData,
+					options: {
+						scales: {
+							yAxes: [{
+								ticks: {
+									beginAtZero:true
+								}
+							}]
+						}
+					}
+				});
+			}
+		}
+	}
+
+	$('.rc-popover').click(function (e) {
 		if (e.currentTarget === e.target) {
 			popover.close();
 		}
@@ -76,8 +119,8 @@ Template.popover.onRendered(function() {
 		const offsetHeight = offsetVertical * (verticalDirection === 'bottom' ? 1 : -1);
 
 		if (position) {
-			popoverContent.style.top = `${ position.top }px`;
-			popoverContent.style.left = `${ position.left }px`;
+			popoverContent.style.top = `${position.top}px`;
+			popoverContent.style.left = `${position.left}px`;
 		} else {
 			const clientHeight = this.data.targetRect.height;
 			const popoverWidth = popoverContent.offsetWidth;
@@ -113,12 +156,12 @@ Template.popover.onRendered(function() {
 				left = mousePosition.x + offsetWidth;
 			}
 
-			popoverContent.style.top = `${ top }px`;
-			popoverContent.style.left = `${ left }px`;
+			popoverContent.style.top = `${top}px`;
+			popoverContent.style.left = `${left}px`;
 		}
 
 		if (customCSSProperties) {
-			Object.keys(customCSSProperties).forEach(function(property) {
+			Object.keys(customCSSProperties).forEach(function (property) {
 				popoverContent.style[property] = customCSSProperties[property];
 			});
 		}
@@ -143,7 +186,7 @@ Template.popover.onRendered(function() {
 	this.firstNode.style.visibility = 'visible';
 });
 
-Template.popover.onDestroyed(function() {
+Template.popover.onDestroyed(function () {
 	if (this.data.onDestroyed) {
 		this.data.onDestroyed();
 	}
@@ -231,7 +274,7 @@ Template.popover.events({
 		}
 
 		if (action === 'unread') {
-			Meteor.call('unreadMessages', null, rid, function(error) {
+			Meteor.call('unreadMessages', null, rid, function (error) {
 				if (error) {
 					return handleError(error);
 				}
@@ -249,7 +292,7 @@ Template.popover.events({
 		}
 
 		if (action === 'favorite') {
-			Meteor.call('toggleFavorite', rid, !$(e.currentTarget).hasClass('rc-popover__item--star-filled'), function(err) {
+			Meteor.call('toggleFavorite', rid, !$(e.currentTarget).hasClass('rc-popover__item--star-filled'), function (err) {
 				popover.close();
 				if (err) {
 					handleError(err);

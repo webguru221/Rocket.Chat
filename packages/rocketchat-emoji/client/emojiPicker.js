@@ -93,6 +93,7 @@ function getEmojisBySearchTerm(searchTerm) {
 
 			if (emojiFound) {
 				const image = emoji.packages[emojiPackage].render(`:${ current }${ tone }:`);
+				console.log(emojiPackage, current, tone);
 				html += `<li class="emoji-${ current }" data-emoji="${ current }" title="${ current }">${ image }</li>`;
 			}
 		}

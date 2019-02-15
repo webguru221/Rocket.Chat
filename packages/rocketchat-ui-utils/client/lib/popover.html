@@ -10,6 +10,9 @@
 							{{#if group.title}}
 								<h3 class="rc-popover__title">{{group.title}}</h3>
 							{{/if}}
+							{{#if group.chart}}
+								<canvas id="emojiChart" width="200" height="200"></canvas>
+							{{/if}}
 							<ul class="rc-popover__list">
 								{{#each item in group.items}}
 									{{# with item}}
@@ -19,7 +22,13 @@
 												{{> icon block="rc-popover__icon-element" icon=item.icon }}
 											</span>
 										{{/if}}
+										{{#if item.emoji}}
+											{{{getEmoji item.emoji}}}
+										{{/if}}
 										<span class="rc-popover__item-text">{{_ item.name}}</span>
+										{{#if item.count  }}
+											<span class="rc-popover__item-text">{{item.count}}</span>
+										{{/if}}
 									</li>
 									{{/with}}
 								{{/each}}

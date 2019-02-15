@@ -15,6 +15,11 @@ const setStatus = (status) => {
 	popover.close();
 };
 
+let emotions = {};
+const inrEmojiCounter = (emotion) => {
+	emotions[emotion] = emotions[emotion] != undefined ? emotions[emotion] + 1 : 1;
+}
+
 const viewModeIcon = {
 	extended: 'th-list',
 	medium: 'list',
@@ -227,6 +232,60 @@ const toolbarButtons = (user) => [{
 								};
 							}).concat([adminOption]),
 						},
+					],
+				},
+			],
+			currentTarget: e.currentTarget,
+			offsetVertical: e.currentTarget.clientHeight + 10,
+		};
+
+		popover.open(config);
+	},
+},
+{
+	name: t('Emoji'),
+	icon: 'emoji',
+	action: (e) => {
+		const config = {
+			popoverClass: 'sidebar-header',
+			columns: [
+				{
+					groups: [
+						{
+							title: t('Emotions'),
+							items: [
+								{
+									emoji: 'smile',
+									name: t('Happy'),
+									action: () => inrEmojiCounter('Happy'),
+								},
+								{
+									emoji: 'frowning2',
+									name: t('Sad'),
+									action: () => inrEmojiCounter('Sad'),
+								},
+								{
+									emoji: 'expressionless',
+									name: t('Uncertain'),
+									action: () => inrEmojiCounter('Uncertain'),
+								},
+								{
+									emoji: 'confused',
+									name: t('Confused'),
+									action: () => inrEmojiCounter('Confused'),
+								}
+							],
+						},
+						{
+							title: t('Stats'),
+							labels: ['Happy', 'Sad', 'Uncertain', 'Confused'],
+							chart: [
+								emotions['Happy'] || 0,
+								emotions['Sad'] || 0,
+								emotions['Uncertain'] || 0,
+								emotions['Confused'] || 0
+							]
+						}
 					],
 				},
 			],
