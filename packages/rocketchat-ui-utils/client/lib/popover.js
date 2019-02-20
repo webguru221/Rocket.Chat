@@ -62,7 +62,7 @@ Template.popover.onRendered(function () {
 
 	if(this.data && this.data.columns[0]) {
 		const group = this.data.columns[0].groups.find(group => group.chart != undefined);
-		if(group && group.chart != undefined) {
+		if(group) {
 			const ctx = document.getElementById("emojiChart");
 
 			if (ctx) {
@@ -70,7 +70,8 @@ Template.popover.onRendered(function () {
 					labels: group.labels,
 					datasets: [{
 						label: 'Emoji stats',
-						data: group.chart
+						data: group.chart,
+						backgroundColor: group.colors
 					}]
 		
 				};

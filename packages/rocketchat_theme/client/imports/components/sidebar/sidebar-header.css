@@ -134,8 +134,8 @@
 	.sidebar {
 		flex: 0 0 20%;
 
-		width: 20%;
-		max-width: 20%;
+		width: 23%;
+		max-width: 23%;
 
 		&__toolbar {
 			justify-content: flex-end;

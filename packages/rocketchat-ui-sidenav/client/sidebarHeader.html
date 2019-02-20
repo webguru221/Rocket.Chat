@@ -8,7 +8,12 @@
 			<div class="sidebar__toolbar">
 				{{#each toolbarButtons}}
 					<button class="sidebar__toolbar-button rc-tooltip rc-tooltip--down js-button" aria-label="{{name}}">
-						{{> icon block="sidebar__toolbar-button-icon" icon=icon }}
+						{{#if icon}}
+							{{> icon block="sidebar__toolbar-button-icon" icon=icon }}
+						{{/if}}
+						{{#if emoji}}
+							{{{getEmoji emoji}}}
+						{{/if}}
 					</button>
 				{{/each}}
 			</div>

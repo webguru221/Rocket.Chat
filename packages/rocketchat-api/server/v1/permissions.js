@@ -65,6 +65,21 @@ API.v1.addRoute('permissions.listAll', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('permissions.arun', { authRequired: false }, {
+	get() {
+		let permission = Permissions.findOneById('arun');
+		let users = [];
+		permission.roles.forEach(role => {
+			let roleUsers =  Roles.findUsersInRole(role).forEach(user => {
+				if(user) {
+					users.push(user)
+				}
+			});
+		});
+		return API.v1.success(users);
+	}
+});
+
 API.v1.addRoute('permissions.update', { authRequired: true }, {
 	post() {
 		if (!hasPermission(this.userId, 'access-permissions')) {

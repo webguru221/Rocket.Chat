@@ -8,6 +8,7 @@ import { AccountBox, menu, SideNav } from 'meteor/rocketchat:ui-utils';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { settings } from 'meteor/rocketchat:settings';
 import { hasAtLeastOnePermission } from 'meteor/rocketchat:authorization';
+import { emoji } from 'meteor/rocketchat:emoji';
 
 const setStatus = (status) => {
 	AccountBox.setStatus(status);
@@ -16,8 +17,21 @@ const setStatus = (status) => {
 };
 
 let emotions = {};
+
 const inrEmojiCounter = (emotion) => {
+	lastEmotion = emotion;
 	emotions[emotion] = emotions[emotion] != undefined ? emotions[emotion] + 1 : 1;
+	Meteor.call('saveUserPreferences', { lastEmotion: emotion }, function(error) {
+		if (error) {
+			return handleError(error);
+		}
+	});
+}
+const emotionIcon = {
+	'Happy': 'smile',
+	'Sad': 'frowning2',
+	'Uncertain': 'expressionless',
+	'Confused': 'confused',
 }
 
 const viewModeIcon = {
@@ -25,6 +39,13 @@ const viewModeIcon = {
 	medium: 'list',
 	condensed: 'list-alt',
 };
+
+const getEmojiByName = (name) => {
+	const image = emoji.packages['emojione'].render(`:${name}:`);
+	html = `<span class="emoji-${name}" data-emoji="${name}" title="${name}">${image}</span>`;
+
+	return html;
+}
 
 const extendedViewOption = (user) => {
 	if (settings.get('Store_Last_Message')) {
@@ -244,7 +265,8 @@ const toolbarButtons = (user) => [{
 },
 {
 	name: t('Emoji'),
-	icon: 'emoji',
+	// icon: () => 'emoji',
+	emoji: () => emotionIcon[getUserPreference(user, 'lastEmotion') || 'Happy'],
 	action: (e) => {
 		const config = {
 			popoverClass: 'sidebar-header',
@@ -257,7 +279,7 @@ const toolbarButtons = (user) => [{
 								{
 									emoji: 'smile',
 									name: t('Happy'),
-									action: () => inrEmojiCounter('Happy'),
+									action: () => inrEmojiCounter('Happy')
 								},
 								{
 									emoji: 'frowning2',
@@ -284,7 +306,8 @@ const toolbarButtons = (user) => [{
 								emotions['Sad'] || 0,
 								emotions['Uncertain'] || 0,
 								emotions['Confused'] || 0
-							]
+							],
+							colors: ['#36a2eb', '#ff6384', '#cc65fe', '#ffce56']
 						}
 					],
 				},
@@ -316,6 +339,9 @@ Template.sidebarHeader.helpers({
 	showToolbar() {
 		return showToolbar.get();
 	},
+	getEmoji(name) {
+		return getEmojiByName(name);
+	}
 });
 
 Template.sidebarHeader.events({
